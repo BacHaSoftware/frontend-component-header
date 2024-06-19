@@ -15,11 +15,6 @@ import MobileHeader from './MobileHeader';
 
 import messages from './Header.messages';
 
-import GymSettings from './data/settings';
-const settings = await GymSettings();
-const mainNav = await settings.navigation.main;
-const domain = await settings.root_url;
-
 ensureConfig([
   'LMS_BASE_URL',
   'LOGOUT_URL',
@@ -38,24 +33,13 @@ subscribe(APP_CONFIG_INITIALIZED, () => {
 const Header = ({ intl }) => {
   const { authenticatedUser, config } = useContext(AppContext);
 
-  const mainMenu = [];
-  
-  mainNav.forEach(item => {
-    mainMenu.push( {
+  const mainMenu = [
+    {
       type: 'item',
-      href: `${domain}${item.href}`,
-      content: item.title,
-    })
-  });
-
-  // Comment out original mainMenu for Gym
-  // const mainMenu = [
-  //   {
-  //     type: 'item',
-  //     href: `${config.LMS_BASE_URL}/dashboard`,
-  //     content: intl.formatMessage(messages['header.links.courses']),
-  //   },
-  // ];
+      href: `${config.LMS_BASE_URL}/dashboard`,
+      content: intl.formatMessage(messages['header.links.courses']),
+    },
+  ];
 
   const orderHistoryItem = {
     type: 'item',
@@ -68,11 +52,6 @@ const Header = ({ intl }) => {
       type: 'item',
       href: `${config.LMS_BASE_URL}/dashboard`,
       content: intl.formatMessage(messages['header.user.menu.dashboard']),
-    },
-    {
-      type: 'item',
-      href: `${config.LMS_BASE_URL}/contact`,
-      content: intl.formatMessage(messages['header.user.menu.contact']),
     },
     {
       type: 'item',
@@ -91,11 +70,10 @@ const Header = ({ intl }) => {
     },
   ];
 
-  // Comment out order history for Gym
   // Users should only see Order History if have a ORDER_HISTORY_URL define in the environment.
-  // if (config.ORDER_HISTORY_URL) {
-  //   userMenu.splice(-1, 0, orderHistoryItem);
-  // }
+  if (config.ORDER_HISTORY_URL) {
+    userMenu.splice(-1, 0, orderHistoryItem);
+  }
 
   const loggedOutItems = [
     {
@@ -113,9 +91,7 @@ const Header = ({ intl }) => {
   const props = {
     logo: config.LOGO_URL,
     logoAltText: config.SITE_NAME,
-    // Change for Gym
-    // logoDestination: `${config.LMS_BASE_URL}/dashboard`,
-    logoDestination: `${domain}`,
+    logoDestination: `${config.LMS_BASE_URL}/dashboard`,
     loggedIn: authenticatedUser !== null,
     username: authenticatedUser !== null ? authenticatedUser.username : null,
     avatar: authenticatedUser !== null ? authenticatedUser.avatar : null,
